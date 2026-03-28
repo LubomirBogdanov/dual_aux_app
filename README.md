@@ -1,4 +1,5 @@
 ![Dual AUX Application](dual_aux_app.png)  
+![Dual AUX Application](dual_aux_app_linux.png)  
 
 Dual AUX Application
 -----------------------------------------------------------------
