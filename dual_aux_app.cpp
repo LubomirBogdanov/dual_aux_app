@@ -8,6 +8,9 @@ dual_aux_app::dual_aux_app(QWidget *parent) : QMainWindow(parent), ui(new Ui::du
 
     ser_port = nullptr;
 
+    //For Qt5.15 uncomment this line!
+    //qRegisterMetaType<QSerialPortInfo>("QSerialPortInfo");
+
     ui->ch0_radiobutton->setFocusPolicy(Qt::NoFocus);
     ui->ch0_radiobutton->installEventFilter(this);
     ui->ch1_radiobutton->setFocusPolicy(Qt::NoFocus);
