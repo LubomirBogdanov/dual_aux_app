@@ -2,6 +2,8 @@
 #define DUAL_AUX_APP_H
 
 #include <QMainWindow>
+#include "common.h"
+#include "auto_detect_uart.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -9,9 +11,10 @@ class dual_aux_app;
 }
 QT_END_NAMESPACE
 
-class dual_aux_app : public QMainWindow
-{
+class dual_aux_app : public QMainWindow{
     Q_OBJECT
+private:
+    auto_detect_uart autodetect_thread;
 
 public:
     dual_aux_app(QWidget *parent = nullptr);
@@ -19,11 +22,8 @@ public:
 
 private slots:
     void on_ch0_pushbutton_clicked();
-
     void on_ch1_pushbutton_clicked();
-
     void on_actionDetect_triggered();
-
     void on_actionExit_2_triggered();
 
 private:
