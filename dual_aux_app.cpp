@@ -13,11 +13,20 @@ dual_aux_app::dual_aux_app(QWidget *parent) : QMainWindow(parent), ui(new Ui::du
     ui->ch1_radiobutton->setFocusPolicy(Qt::NoFocus);
     ui->ch1_radiobutton->installEventFilter(this);
 
-    connect(&autodetect_thread, SIGNAL(uart_device_search(bool, QSerialPortInfo)), this, SLOT(on_uart_device_search(bool, QSerialPortInfo)));
-    autodetect_thread.set_device_to_search_for(temp_str);
-    autodetect_thread.start();
+    disable_controls();
 
     this->setWindowTitle(APPLICATION_NAME);
+
+    autodetect_thread = new auto_detect_uart;
+    if(autodetect_thread){
+        connect(autodetect_thread, SIGNAL(uart_device_search(bool, QSerialPortInfo)), this, SLOT(on_uart_device_search(bool, QSerialPortInfo)));
+        autodetect_thread->set_device_to_search_for(temp_str);
+        autodetect_thread->start();
+    }
+    else{
+        qDebug() << "Failed to create UART autodetect thread! Aborting ...";
+        close();
+    }
 }
 
 dual_aux_app::~dual_aux_app(){
@@ -26,7 +35,32 @@ dual_aux_app::~dual_aux_app(){
         delete ser_port;
     }
 
+    if(autodetect_thread){
+        delete autodetect_thread;
+    }
+
     delete ui;
+}
+
+void dual_aux_app::disable_controls(){
+    qDebug() << "(dual_aux_app) disable_controls";
+
+    ui->ch0_pushbutton->setDisabled(1);
+    ui->ch1_pushbutton->setDisabled(1);
+
+    ui->ch0_radiobutton->setAutoExclusive(0);
+    ui->ch1_radiobutton->setAutoExclusive(0);
+    ui->ch0_radiobutton->setChecked(0);
+    ui->ch1_radiobutton->setChecked(0);
+    ui->ch0_radiobutton->setAutoExclusive(1);
+    ui->ch1_radiobutton->setAutoExclusive(1);
+}
+
+void dual_aux_app::enable_controls(){
+    qDebug() << "(dual_aux_app) enable_controls";
+
+    ui->ch0_pushbutton->setDisabled(0);
+    ui->ch1_pushbutton->setDisabled(0);
 }
 
 void dual_aux_app::on_uart_device_search(bool found, QSerialPortInfo dev){
@@ -47,8 +81,8 @@ void dual_aux_app::on_uart_device_search(bool found, QSerialPortInfo dev){
 
                 connect(ser_port, SIGNAL(errorOccurred(QSerialPort::SerialPortError)), this, SLOT(on_uart_error(QSerialPort::SerialPortError)));
                 connect(ser_port, SIGNAL(readyRead()), this, SLOT(on_uart_ready_read()));
-                ui->ch0_pushbutton->setDisabled(0);
-                ui->ch1_pushbutton->setDisabled(0);
+
+                enable_controls();
 
                 qDebug()<<"(dual_aux_app) tx: " << CH_GET_STRING;
                 ser_port->write(CH_GET_STRING, strlen(CH_GET_STRING));
@@ -58,14 +92,15 @@ void dual_aux_app::on_uart_device_search(bool found, QSerialPortInfo dev){
                 qDebug() << "(dual_aux_app) Failed to open port: " << dev.portName() << "!";
                 delete ser_port;
                 ser_port = nullptr;
-                ui->ch0_pushbutton->setDisabled(1);
-                ui->ch1_pushbutton->setDisabled(1);
+                disable_controls();
             }
         }
         else{
-            ui->ch0_pushbutton->setDisabled(1);
-            ui->ch1_pushbutton->setDisabled(1);
+            disable_controls();
         }
+    }
+    else{
+        disable_controls();
     }
 }
 
@@ -73,14 +108,7 @@ void dual_aux_app::on_uart_error(QSerialPort::SerialPortError error){
     if (error == QSerialPort::ResourceError || error == QSerialPort::DeviceNotFoundError) {
         qDebug() << "(dual_aux_app) Device disconnected!";
 
-        ui->ch0_pushbutton->setDisabled(1);
-        ui->ch1_pushbutton->setDisabled(1);
-        ui->ch0_pushbutton->setAutoExclusive(0);
-        ui->ch1_radiobutton->setAutoExclusive(0);
-        ui->ch0_radiobutton->setChecked(0);
-        ui->ch1_radiobutton->setChecked(0);
-        ui->ch0_pushbutton->setAutoExclusive(1);
-        ui->ch1_radiobutton->setAutoExclusive(1);
+        disable_controls();
 
         if (ser_port->isOpen()){
             ser_port->close();
@@ -159,7 +187,7 @@ void dual_aux_app::on_ch1_pushbutton_clicked(){
 
 void dual_aux_app::on_actionDetect_triggered(){
     qDebug() << "(dual_aux_app) on_actionDetect_triggered";
-    autodetect_thread.start();
+    autodetect_thread->start();
 }
 
 void dual_aux_app::on_actionExit_2_triggered(){

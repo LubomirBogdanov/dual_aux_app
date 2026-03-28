@@ -14,9 +14,11 @@ class dual_aux_app : public QMainWindow{
     Q_OBJECT
 private:
     QSerialPort *ser_port;
-    auto_detect_uart autodetect_thread;
+    auto_detect_uart *autodetect_thread;
 
 public:
+    void disable_controls();
+    void enable_controls();
     dual_aux_app(QWidget *parent = nullptr);
     ~dual_aux_app();
 
