@@ -7,7 +7,6 @@
 #include <QFileInfo>
 #include <QDebug>
 
-#define DEVICE_CMD_IDN "*IDN?\n"
 #define AUTODETECT_DEVICE_TIMEOUT 100 //in ms
 #define AUTODETECT_DEVICE_BAUD QSerialPort::Baud9600
 

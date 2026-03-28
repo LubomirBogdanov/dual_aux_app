@@ -2,7 +2,6 @@
 #define DUAL_AUX_APP_H
 
 #include <QMainWindow>
-#include "common.h"
 #include "auto_detect_uart.h"
 
 QT_BEGIN_NAMESPACE
@@ -28,8 +27,12 @@ private slots:
     void on_actionExit_2_triggered();
     void on_uart_device_search(bool found, QSerialPortInfo dev);
     void on_uart_error(QSerialPort::SerialPortError error);
+    void on_uart_ready_read();
 
 private:
     Ui::dual_aux_app *ui;
+
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 };
 #endif // DUAL_AUX_APP_H

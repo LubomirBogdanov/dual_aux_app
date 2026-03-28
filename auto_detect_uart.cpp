@@ -1,4 +1,5 @@
 #include "auto_detect_uart.h"
+#include "common.h"
 
 auto_detect_uart::auto_detect_uart(){
     uart_dev = NULL;
