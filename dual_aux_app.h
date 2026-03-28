@@ -14,6 +14,7 @@ QT_END_NAMESPACE
 class dual_aux_app : public QMainWindow{
     Q_OBJECT
 private:
+    QSerialPort *ser_port;
     auto_detect_uart autodetect_thread;
 
 public:
@@ -25,6 +26,8 @@ private slots:
     void on_ch1_pushbutton_clicked();
     void on_actionDetect_triggered();
     void on_actionExit_2_triggered();
+    void on_uart_device_search(bool found, QSerialPortInfo dev);
+    void on_uart_error(QSerialPort::SerialPortError error);
 
 private:
     Ui::dual_aux_app *ui;

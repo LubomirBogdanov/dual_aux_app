@@ -19,6 +19,8 @@ void auto_detect_uart::run(){
     QString cmd;
     QByteArray msg_buff;
     QString msg_buff_str;
+    QSerialPortInfo empty_port_info;
+    int device_index = 0;
 
     QList<QSerialPortInfo> ports = QSerialPortInfo::availablePorts();
 
@@ -67,7 +69,7 @@ void auto_detect_uart::run(){
                 if(msg_buff_str.contains(device_to_search_for)){
                     qDebug()<<"(auto_detect_uart) Device "<<device_to_search_for<<" found!";
                     search_result = 1;
-                    emit uart_device_search(true, ports.at(i).portName());
+                    device_index = i;
                 }
 
                 msg_buff.resize(0);
@@ -83,7 +85,10 @@ void auto_detect_uart::run(){
         qDebug()<<"(auto_detect_uart) Failed to create QSerialPort object!";
     }
 
-    if(!search_result){
-        emit uart_device_search(false, "");
+    if(search_result && (ports.size() >= 1)){
+        emit uart_device_search(true, ports.at(device_index));
+    }
+    else{
+        emit uart_device_search(false, empty_port_info);
     }
 }
