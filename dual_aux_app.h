@@ -27,9 +27,11 @@ private slots:
     void on_ch1_pushbutton_clicked();
     void on_actionDetect_triggered();
     void on_actionExit_2_triggered();
-    void on_uart_device_search(bool found, QSerialPortInfo dev);
+    void on_uart_device_search(bool found, QSerialPortInfo dev, QString dev_idn_string);
     void on_uart_error(QSerialPort::SerialPortError error);
     void on_uart_ready_read();
+    void on_actionTurn_LEDs_on_triggered();
+    void on_actionTurn_LEDs_off_triggered();
 
 private:
     Ui::dual_aux_app *ui;

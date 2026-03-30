@@ -9,7 +9,7 @@ dual_aux_app::dual_aux_app(QWidget *parent) : QMainWindow(parent), ui(new Ui::du
     ser_port = nullptr;
 
     //For Qt5.15 uncomment this line!
-    //qRegisterMetaType<QSerialPortInfo>("QSerialPortInfo");
+    qRegisterMetaType<QSerialPortInfo>("QSerialPortInfo");
 
     ui->ch0_radiobutton->setFocusPolicy(Qt::NoFocus);
     ui->ch0_radiobutton->installEventFilter(this);
@@ -22,7 +22,7 @@ dual_aux_app::dual_aux_app(QWidget *parent) : QMainWindow(parent), ui(new Ui::du
 
     autodetect_thread = new auto_detect_uart;
     if(autodetect_thread){
-        connect(autodetect_thread, SIGNAL(uart_device_search(bool, QSerialPortInfo)), this, SLOT(on_uart_device_search(bool, QSerialPortInfo)));
+        connect(autodetect_thread, SIGNAL(uart_device_search(bool, QSerialPortInfo, QString)), this, SLOT(on_uart_device_search(bool, QSerialPortInfo, QString)));
         autodetect_thread->set_device_to_search_for(temp_str);
         autodetect_thread->start();
     }
@@ -66,9 +66,11 @@ void dual_aux_app::enable_controls(){
     ui->ch1_pushbutton->setDisabled(0);
 }
 
-void dual_aux_app::on_uart_device_search(bool found, QSerialPortInfo dev){
-    qDebug() << "(dual_aux_app) Search result: " << found << ", dev_name: " << dev.portName();
+void dual_aux_app::on_uart_device_search(bool found, QSerialPortInfo dev, QString dev_idn_string){
+    qDebug() << "(dual_aux_app) Search result: " << found << ", dev port: " << dev.portName() << ", dev idn string: " << dev_idn_string;
 
+    dev_idn_string.prepend("Device string: ");
+    ui->device_string_label->setText(dev_idn_string);
     if(found){
         if(!ser_port){
             ser_port = new QSerialPort(this);
@@ -89,6 +91,9 @@ void dual_aux_app::on_uart_device_search(bool found, QSerialPortInfo dev){
 
                 qDebug()<<"(dual_aux_app) tx: " << CH_GET_STRING;
                 ser_port->write(CH_GET_STRING, strlen(CH_GET_STRING));
+                ser_port->flush();
+
+                ser_port->write(LEDS_GET_STRING, strlen(LEDS_GET_STRING));
                 ser_port->flush();
             }
             else{
@@ -149,6 +154,16 @@ void dual_aux_app::on_uart_ready_read(){
             ui->ch1_radiobutton->setChecked(1);
         }
 
+        if(reply.contains(LEDS_ARE_ON_STRING)){
+            qDebug() << "(dual_aux_app) Reply: " << LEDS_ON_STRING;
+            ui->leds_on_off_label->setText("Leds: ON");
+        }
+
+        if(reply.contains(LEDS_ARE_OFF_STRING)){
+            qDebug() << "(dual_aux_app) Reply: " << LEDS_OFF_STRING;
+            ui->leds_on_off_label->setText("Leds: OFF");
+        }
+
         if(reply.contains(SAVING_IN_EEPROM)){
             qDebug() << "(dual_aux_app) Reply: " << SAVING_IN_EEPROM;
         }
@@ -190,6 +205,14 @@ void dual_aux_app::on_ch1_pushbutton_clicked(){
 
 void dual_aux_app::on_actionDetect_triggered(){
     qDebug() << "(dual_aux_app) on_actionDetect_triggered";
+
+    if(ser_port){
+        ser_port->close();
+        delete ser_port;
+        ser_port = nullptr;
+        disable_controls();
+    }
+
     autodetect_thread->start();
 }
 
@@ -198,3 +221,18 @@ void dual_aux_app::on_actionExit_2_triggered(){
     close();
 }
 
+
+void dual_aux_app::on_actionTurn_LEDs_on_triggered(){
+    qDebug() << "(dual_aux_app) on_actionTurn_LEDs_on_triggered";
+
+    if(ser_port){
+        ser_port->write(LEDS_ON_STRING, strlen(LEDS_ON_STRING));
+        ser_port->flush();
+    }
+}
+
+void dual_aux_app::on_actionTurn_LEDs_off_triggered(){
+    qDebug() << "(dual_aux_app) on_actionTurn_LEDs_off_triggered";
+    ser_port->write(LEDS_OFF_STRING, strlen(LEDS_OFF_STRING));
+    ser_port->flush();
+}

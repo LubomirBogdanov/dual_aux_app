@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>211</width>
-    <height>287</height>
+    <width>162</width>
+    <height>268</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,20 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <widget class="QLabel" name="device_string_label">
+      <property name="text">
+       <string>Device string:</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QLabel" name="leds_on_off_label">
+      <property name="text">
+       <string>Leds: </string>
+      </property>
+     </widget>
+    </item>
     <item>
      <widget class="QGroupBox" name="groupBox">
       <property name="maximumSize">
@@ -69,8 +83,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>211</width>
-     <height>26</height>
+     <width>162</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -78,6 +92,8 @@
      <string>File</string>
     </property>
     <addaction name="actionDetect"/>
+    <addaction name="actionTurn_LEDs_on"/>
+    <addaction name="actionTurn_LEDs_off"/>
     <addaction name="actionExit_2"/>
    </widget>
    <addaction name="menuFile"/>
@@ -91,6 +107,16 @@
   <action name="actionExit_2">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionTurn_LEDs_on">
+   <property name="text">
+    <string>Turn LEDs on</string>
+   </property>
+  </action>
+  <action name="actionTurn_LEDs_off">
+   <property name="text">
+    <string>Turn LEDs off</string>
    </property>
   </action>
  </widget>

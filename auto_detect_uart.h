@@ -23,7 +23,7 @@ public:
     void set_device_to_search_for(QString &dev_name);
 
 signals:
-    void uart_device_search(bool found, QSerialPortInfo dev);
+    void uart_device_search(bool found, QSerialPortInfo dev, QString dev_idn_string);
 };
 
 #endif // AUTO_DETECT_UART_H

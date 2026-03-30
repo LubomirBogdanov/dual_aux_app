@@ -76,6 +76,10 @@ void auto_detect_uart::run(){
                 msg_buff.resize(0);
 
                 uart_dev->close();
+
+                if(search_result){
+                    break;
+                }
             }
             else{
                 qDebug()<<"(auto_detect_uart) Can't open: " << uart_dev->portName();
@@ -87,9 +91,12 @@ void auto_detect_uart::run(){
     }
 
     if(search_result && (ports.size() >= 1)){
-        emit uart_device_search(true, ports.at(device_index));
+        msg_buff_str.remove(DEVICE_CMD_IDN);
+        msg_buff_str.remove("\n");
+        msg_buff_str.remove("\r");
+        emit uart_device_search(true, ports.at(device_index), msg_buff_str);
     }
     else{
-        emit uart_device_search(false, empty_port_info);
+        emit uart_device_search(false, empty_port_info, "not found");
     }
 }
